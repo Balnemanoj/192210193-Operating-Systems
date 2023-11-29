@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
+// Function to be executed by the first thread
+void *thread_function_1(void *arg) {
+    for (int i = 1; i <= 5; ++i) {
+        printf("Thread 1: Iteration %d\n", i);
+    }
+    pthread_exit(NULL);
+}
+
+// Function to be executed by the second thread
+void *thread_function_2(void *arg) {
+    for (int i = 1; i <= 5; ++i) {
+        printf("Thread 2: Iteration %d\n", i);
+    }
+    pthread_exit(NULL);
+}
+
+int main() {
+    // Declare thread identifiers
+    pthread_t thread1, thread2;
+
+    // Create the first thread
+    if (pthread_create(&thread1, NULL, thread_function_1, NULL) != 0) {
+        perror("pthread_create");
+        exit(EXIT_FAILURE);
+    }
+
+    // Create the second thread
+    if (pthread_create(&thread2, NULL, thread_function_2, NULL) != 0) {
+        perror("pthread_create");
+        exit(EXIT_FAILURE);
+    }
+
+    // Wait for the threads to finish
+    if (pthread_join(thread1, NULL) != 0) {
+        perror("pthread_join");
+        exit(EXIT_FAILURE);
+    }
+
+    if (pthread_join(thread2, NULL) != 0) {
+        perror("pthread_join");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Both threads have finished.\n");
+
+    return 0;
+}
