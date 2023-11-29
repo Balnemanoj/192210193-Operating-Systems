@@ -1,0 +1,42 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#define NUM_THREADS 2
+int sharedData = 0;
+pthread_mutex_t mutexLock;
+void *printNumbers(void *threadId);
+int main() {
+    pthread_t threads[NUM_THREADS];
+    int threadIds[NUM_THREADS];
+    if (pthread_mutex_init(&mutexLock, NULL) != 0) {
+        fprintf(stderr, "Error initializing mutex lock.\n");
+        return 1;
+    }
+    for (int i = 0; i < NUM_THREADS; i++) {
+        threadIds[i] = i + 1;
+        if (pthread_create(&threads[i], NULL, printNumbers, (void *)&threadIds[i]) != 0) {
+            fprintf(stderr, "Error creating thread %d.\n", i + 1);
+            return 1;
+        }
+    }
+    for (int i = 0; i < NUM_THREADS; i++) {
+        if (pthread_join(threads[i], NULL) != 0) {
+            fprintf(stderr, "Error joining thread %d.\n", i + 1);
+            return 1;
+        }
+    }
+    pthread_mutex_destroy(&mutexLock);
+    return 0;
+}
+void *printNumbers(void *threadId) {
+    int id = *((int *)threadId);
+    for (int i = 0; i < 5; i++) {
+        pthread_mutex_lock(&mutexLock);
+        printf("Thread %d: Shared Data = %d\n", id, sharedData);
+        sharedData++;
+        pthread_mutex_unlock(&mutexLock);
+
+        sleep(1);
+    }
+    pthread_exit(NULL);
+}
