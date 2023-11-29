@@ -1,0 +1,113 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_BLOCKS 100
+struct MemoryBlock {
+    int id;
+    int size;
+    int allocated;
+};
+struct MemoryBlock memory[MAX_BLOCKS];
+void initializeMemory();
+void displayMenu();
+int allocateMemory(int size, int strategy);
+void deallocateMemory(int blockId);
+void displayMemoryStatus();
+int main() {
+    initializeMemory();
+    int choice;
+    do {
+        displayMenu();
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1: {
+                int size, strategy;
+                printf("Enter the size of the memory block to allocate: ");
+                scanf("%d", &size);
+                printf("Choose allocation strategy (1 for First-Fit, 2 for Best-Fit, 3 for Worst-Fit): ");
+                scanf("%d", &strategy);
+
+                int blockId = allocateMemory(size, strategy);
+                if (blockId != -1) {
+                    printf("Memory allocated successfully. Block ID: %d\n", blockId);
+                } else {
+                    printf("Memory allocation failed.\n");
+                }
+                break;
+            }
+            case 2: {
+                int blockId;
+                printf("Enter the block ID to deallocate: ");
+                scanf("%d", &blockId);
+                deallocateMemory(blockId);
+                break;
+            }
+            case 3:
+                displayMemoryStatus();
+                break;
+            case 4:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
+void initializeMemory() {
+    for (int i = 0; i < MAX_BLOCKS; ++i) {
+        memory[i].id = i + 1;
+        memory[i].size = 0;
+        memory[i].allocated = 0;
+    }
+}
+void displayMenu() {
+    printf("\nMemory Allocation Strategies\n");
+    printf("1. Allocate Memory\n");
+    printf("2. Deallocate Memory\n");
+    printf("3. Display Memory Status\n");
+    printf("4. Exit\n");
+}
+int allocateMemory(int size, int strategy) {
+    int blockId = -1;
+    switch (strategy) {
+        case 1: 
+            for (int i = 0; i < MAX_BLOCKS; ++i) {
+                if (!memory[i].allocated && memory[i].size >= size) {
+                    memory[i].size = size;
+                    memory[i].allocated = 1;
+                    blockId = memory[i].id;
+                    break;
+                }
+            }
+            break;
+        case 2: 
+            break;
+        case 3: 
+            break;
+        default:
+            printf("Invalid allocation strategy.\n");
+    }
+
+    return blockId;
+}
+void deallocateMemory(int blockId) {
+    for (int i = 0; i < MAX_BLOCKS; ++i) {
+        if (memory[i].id == blockId) {
+            memory[i].size = 0;
+            memory[i].allocated = 0;
+            printf("Memory block with ID %d deallocated.\n", blockId);
+            return;
+        }
+    }
+    printf("Memory block with ID %d not found.\n", blockId);
+}
+void displayMemoryStatus() {
+    printf("\nMemory Status:\n");
+    printf("%-10s%-10s%-15s\n", "Block ID", "Size", "Allocated");
+    for (int i = 0; i < MAX_BLOCKS; ++i) {
+        printf("%-10d%-10d%-15s\n", memory[i].id, memory[i].size, memory[i].allocated ? "Yes" : "No");
+    }
+}
