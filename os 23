@@ -1,0 +1,75 @@
+#include <stdio.h>
+
+#define MEMORY_SIZE 1000
+
+struct Block {
+    int size;
+    int allocated; // 1 if allocated, 0 if free
+};
+
+struct Block memory[MEMORY_SIZE];
+
+void initializeMemory() {
+    // Initialize the entire memory as one free block
+    memory[0].size = MEMORY_SIZE;
+    memory[0].allocated = 0;
+}
+
+void displayMemory() {
+    printf("Memory Status:\n");
+    for (int i = 0; i < MEMORY_SIZE; i++) {
+        if (memory[i].allocated) {
+            printf("Allocated Block of Size %d\n", memory[i].size);
+        } else {
+            printf("Free Block of Size %d\n", memory[i].size);
+        }
+    }
+    printf("\n");
+}
+
+int firstFit(int size) {
+    for (int i = 0; i < MEMORY_SIZE; i++) {
+        if (!memory[i].allocated && memory[i].size >= size) {
+            return i;
+        }
+    }
+    return -1; // No suitable block found
+}
+
+void allocateMemory(int processSize) {
+    int index = firstFit(processSize);
+
+    if (index != -1) {
+        // Allocate memory for the process
+        memory[index].allocated = 1;
+
+        // Split the block if it's larger than needed
+        if (memory[index].size > processSize) {
+            int remainingSize = memory[index].size - processSize;
+            memory[index + processSize].size = remainingSize;
+            memory[index + processSize].allocated = 0;
+            memory[index].size = processSize;
+        }
+
+        printf("Memory Allocated Successfully!\n");
+    } else {
+        printf("Memory Allocation Failed. Not enough space.\n");
+    }
+}
+
+int main() {
+    initializeMemory();
+
+    // Display initial memory status
+    displayMemory();
+
+    // Allocate memory for processes
+    allocateMemory(200);
+    allocateMemory(300);
+    allocateMemory(150);
+
+    // Display final memory status
+    displayMemory();
+
+    return 0;
+}
