@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+void organizeFiles() {
+    const char *extensions[] = {".txt", ".pdf", ".jpg", ".png"};
+    const char *directories[] = {"text_files", "pdf_files", "image_files", "other_files"};
+    for (size_t i = 0; i < sizeof(extensions) / sizeof(extensions[0]); ++i) {
+        mkdir(directories[i], 0777);
+        DIR *dir = opendir(".");
+        struct dirent *entry;
+        while ((entry = readdir(dir)) != NULL) {
+            if (entry->d_type == DT_REG && strstr(entry->d_name, extensions[i])) {
+                rename(entry->d_name, directories[i]);
+            }
+        }
+        closedir(dir);
+    }
+}
+int main() {
+    organizeFiles();
+    printf("Files organized successfully.\n");
+    return 0;
+}
