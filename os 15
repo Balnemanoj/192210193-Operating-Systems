@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_FILES 100
+#define MAX_NAME_LENGTH 30
+struct File {
+    char name[MAX_NAME_LENGTH];
+    char content[100]; 
+};
+struct Directory {
+    char name[MAX_NAME_LENGTH];
+    struct File files[MAX_FILES];
+    int fileCount;
+};
+struct FileSystem {
+    struct Directory root;
+    struct Directory subdirectories[MAX_FILES];
+    int subdirectoryCount;
+};
+void initializeFileSystem(struct FileSystem *fs);
+void createDirectory(struct FileSystem *fs, const char *dirName);
+void createFile(struct FileSystem *fs, const char *dirName, const char *fileName, const char *content);
+void displayFileSystem(struct FileSystem *fs);
+int main() {
+    struct FileSystem fs;
+    initializeFileSystem(&fs);
+    createDirectory(&fs, "Documents");
+    createDirectory(&fs, "Pictures");
+    createDirectory(&fs, "Music");
+    createFile(&fs, "Documents", "report.txt", "This is the content of the report.");
+    createFile(&fs, "Pictures", "vacation.jpg", "Image file from the vacation.");
+    createFile(&fs, "Music", "song.mp3", "MP3 file of a song.");
+
+    displayFileSystem(&fs);
+    return 0;
+}
+void initializeFileSystem(struct FileSystem *fs) {
+    strcpy(fs->root.name, "Root");
+    fs->root.fileCount = 0;
+    fs->subdirectoryCount = 0;
+}
+void createDirectory(struct FileSystem *fs, const char *dirName) {
+    if (fs->subdirectoryCount < MAX_FILES) {
+        strcpy(fs->subdirectories[fs->subdirectoryCount].name, dirName);
+        fs->subdirectories[fs->subdirectoryCount].fileCount = 0;
+        fs->subdirectoryCount++;
+        printf("Directory '%s' created.\n", dirName);
+    } else {
+        printf("Error: Maximum number of directories reached.\n");
+    }
+}
+void createFile(struct FileSystem *fs, const char *dirName, const char *fileName, const char *content) {
+    // Search for the specified directory
+    for (int i = 0; i < fs->subdirectoryCount; ++i) {
+        if (strcmp(fs->subdirectories[i].name, dirName) == 0) {
+            // Check if the directory has space for the file
+            if (fs->subdirectories[i].fileCount < MAX_FILES) {
+                // Create the file
+                strcpy(fs->subdirectories[i].files[fs->subdirectories[i].fileCount].name, fileName);
+                strcpy(fs->subdirectories[i].files[fs->subdirectories[i].fileCount].content, content);
+                fs->subdirectories[i].fileCount++;
+                printf("File '%s' created in directory '%s'.\n", fileName, dirName);
+            } else {
+                printf("Error: Maximum number of files reached in directory '%s'.\n", dirName);
+            }
+            return;
+        }
+    }
+    printf("Error: Directory '%s' not found.\n", dirName);
+}
+void displayFileSystem(struct FileSystem *fs) {
+    printf("\nFile System Structure:\n");
+    printf("Root\n");
+    for (int i = 0; i < fs->subdirectoryCount; ++i) {
+        printf("  |-- %s\n", fs->subdirectories[i].name);
+        for (int j = 0; j < fs->subdirectories[i].fileCount; ++j) {
+            printf("      |-- %s\n", fs->subdirectories[i].files[j].name);
+        }
+    }
+}
