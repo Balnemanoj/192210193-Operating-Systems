@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+void displayPermissions(const char *filename) {
+    struct stat fileStat;
+    if (stat(filename, &fileStat) == -1) {
+        perror("Error in stat");
+        exit(EXIT_FAILURE);
+    }
+    printf("File Permissions: ");
+    printf((S_ISDIR(fileStat.st_mode)) ? "d" : "-");
+    printf((fileStat.st_mode & S_IRUSR) ? "r" : "-");
+    printf((fileStat.st_mode & S_IWUSR) ? "w" : "-");
+    printf((fileStat.st_mode & S_IXUSR) ? "x" : "-");
+    printf((fileStat.st_mode & S_IRGRP) ? "r" : "-");
+    printf((fileStat.st_mode & S_IWGRP) ? "w" : "-");
+    printf((fileStat.st_mode & S_IXGRP) ? "x" : "-");
+    printf((fileStat.st_mode & S_IROTH) ? "r" : "-");
+    printf((fileStat.st_mode & S_IWOTH) ? "w" : "-");
+    printf((fileStat.st_mode & S_IXOTH) ? "x" : "-");
+    printf("\n");
+}
+void setPermissions(const char *filename, mode_t permissions) {
+    if (chmod(filename, permissions) == -1) {
+        perror("Error in chmod");
+        exit(EXIT_FAILURE);
+    }
+    printf("Permissions set successfully.\n");
+}
+int main() {
+    const char *filename = "example.txt";
+    mode_t newPermissions = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH; 
+    printf("Before setting new permissions:\n");
+    displayPermissions(filename);
+    setPermissions(filename, newPermissions);
+    printf("\nAfter setting new permissions:\n");
+    displayPermissions(filename);
+    return 0;
+}
