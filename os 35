@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_BLOCKS 100
+#define BLOCK_SIZE 50
+#define MAX_INDEX_ENTRIES 10
+struct Block {
+    char data[BLOCK_SIZE];
+};
+struct IndexBlock {
+    int indexEntries[MAX_INDEX_ENTRIES];
+};
+void writeBlock(struct Block *blocks, int blockNumber, const char *data) {
+    snprintf(blocks[blockNumber].data, sizeof(blocks[blockNumber].data), "%s", data);
+}
+void readBlock(const struct Block *blocks, int blockNumber) {
+    printf("Block #%d: %s\n", blockNumber, blocks[blockNumber].data);
+}
+void writeFile(struct Block *blocks, struct IndexBlock *indexBlock, int *currentPosition, const char *data) {
+    if (*currentPosition < MAX_INDEX_ENTRIES) {
+        int blockNumber = *currentPosition;
+        writeBlock(blocks, blockNumber, data);
+        indexBlock->indexEntries[*currentPosition] = blockNumber;
+        (*currentPosition)++;
+        printf("Data written to Block #%d.\n", blockNumber);
+    } else {
+        printf("Error: File is full. Cannot write more blocks.\n");
+    }
+}
+void readFile(const struct Block *blocks, const struct IndexBlock *indexBlock, int currentPosition) {
+    printf("Reading the entire file:\n");
+    for (int i = 0; i < currentPosition; ++i) {
+        int blockNumber = indexBlock->indexEntries[i];
+        readBlock(blocks, blockNumber);
+    }
+}
+int main() {
+    struct Block blocks[MAX_BLOCKS];
+    struct IndexBlock indexBlock;
+    int currentPosition = 0;
+    writeFile(blocks, &indexBlock, &currentPosition, "Data for Block 1");
+    writeFile(blocks, &indexBlock, &currentPosition, "Data for Block 2");
+    writeFile(blocks, &indexBlock, &currentPosition, "Data for Block 3");
+    readFile(blocks, &indexBlock, currentPosition);
+    return 0;
+}
