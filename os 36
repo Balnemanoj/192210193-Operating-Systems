@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define BLOCK_SIZE 50
+struct Block {
+    char data[BLOCK_SIZE];
+    struct Block *nextBlock;
+};
+struct File {
+    struct Block *firstBlock;
+    struct Block *lastBlock;
+};
+void writeBlock(struct Block *block, const char *data) {
+    snprintf(block->data, sizeof(block->data), "%s", data);
+}
+void readBlock(const struct Block *block) {
+    printf("Block Data: %s\n", block->data);
+}
+void writeFile(struct File *file, const char *data) {
+    struct Block *newBlock = (struct Block *)malloc(sizeof(struct Block));
+    if (newBlock == NULL) {
+        printf("Error: Memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    writeBlock(newBlock, data);
+    newBlock->nextBlock = NULL;
+    if (file->firstBlock == NULL) {
+        file->firstBlock = newBlock;
+        file->lastBlock = newBlock;
+    } else {
+        file->lastBlock->nextBlock = newBlock;
+        file->lastBlock = newBlock;
+    }
+    printf("Data written to file.\n");
+}
+void readFile(const struct File *file) {
+    if (file->firstBlock == NULL) {
+        printf("File is empty.\n");
+        return;
+    }
+    printf("Reading the entire file:\n");
+    struct Block *currentBlock = file->firstBlock;
+    while (currentBlock != NULL) {
+        readBlock(currentBlock);
+        currentBlock = currentBlock->nextBlock;
+    }
+}
+void freeFile(struct File *file) {
+    struct Block *currentBlock = file->firstBlock;
+    while (currentBlock != NULL) {
+        struct Block *nextBlock = currentBlock->nextBlock;
+        free(currentBlock);
+        currentBlock = nextBlock;
+    }
+}
+int main() {
+    struct File file;
+    file.firstBlock = NULL;
+    file.lastBlock = NULL;
+    writeFile(&file, "Data for Block 1");
+    writeFile(&file, "Data for Block 2");
+    writeFile(&file, "Data for Block 3");
+    readFile(&file);
+    freeFile(&file);
+    return 0;
+}
