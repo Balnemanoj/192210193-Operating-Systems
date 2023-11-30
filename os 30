@@ -1,0 +1,104 @@
+void *threadFunction(void *arg) {
+    printf("Inside the thread function\n");
+    pthread_exit(NULL);
+}
+int main() {
+    pthread_t tid;
+    int result;
+    result = pthread_create(&tid, NULL, threadFunction, NULL);
+    if (result != 0) {
+        perror("Thread creation failed");
+        return -1;
+    }
+    printf("Thread created successfully\n");
+    pthread_join(tid, NULL);
+    printf("Main thread exiting\n");
+    return 0;
+}
+#include <stdio.h>
+#include <pthread.h>
+
+void *threadFunction(void *arg) {
+    printf("Inside the thread function\n");
+    return NULL;
+}
+
+int main() {
+    pthread_t tid;
+    int result;
+
+    result = pthread_create(&tid, NULL, threadFunction, NULL);
+    if (result != 0) {
+        perror("Thread creation failed");
+        return -1;
+    }
+    printf("Thread created successfully\n");
+    result = pthread_join(tid, NULL);
+    if (result != 0) {
+        perror("Thread join failed");
+        return -1;
+    }
+    printf("Main thread exiting\n");
+    return 0;
+}
+#include <stdio.h>
+#include <pthread.h>
+
+void *threadFunction(void *arg) {
+    printf("Inside the thread function\n");
+    return NULL;
+}
+
+int main() {
+    pthread_t tid1, tid2;
+    int result;
+
+    result = pthread_create(&tid1, NULL, threadFunction, NULL);
+    if (result != 0) {
+        perror("Thread creation failed");
+        return -1;
+    }
+
+    result = pthread_create(&tid2, NULL, threadFunction, NULL);
+    if (result != 0) {
+        perror("Thread creation failed");
+        return -1;
+    }
+    if (pthread_equal(tid1, tid2)) {
+        printf("Threads are equal\n");
+    } else {
+        printf("Threads are not equal\n");
+    }
+    pthread_join(tid1, NULL);
+    pthread_join(tid2, NULL);
+    printf("Main thread exiting\n");
+    return 0;
+}
+#include <stdio.h>
+#include <pthread.h>
+
+void *threadFunction(void *arg) {
+    printf("Inside the thread function\n");
+
+    // Thread exits with a status
+    pthread_exit((void *)42);
+}
+
+int main() {
+    pthread_t tid;
+    int result;
+    void *status;
+    result = pthread_create(&tid, NULL, threadFunction, NULL);
+    if (result != 0) {
+        perror("Thread creation failed");
+        return -1;
+    }
+    result = pthread_join(tid, &status);
+    if (result != 0) {
+        perror("Thread join failed");
+        return -1;
+    }
+    printf("Thread exited with status: %ld\n", (long)status);
+    printf("Main thread exiting\n");
+    return 0;
+}
