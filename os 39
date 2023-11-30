@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_REQUESTS 100
+int calculateTotalHeadMovement(const int requests[], int numRequests, int initialHeadPosition, int diskSize) {
+    int totalHeadMovement = 0;
+    int sortedRequests[MAX_REQUESTS];
+    for (int i = 0; i < numRequests; ++i) {
+        sortedRequests[i] = requests[i];
+    }
+    for (int i = 0; i < numRequests - 1; ++i) {
+        for (int j = 0; j < numRequests - i - 1; ++j) {
+            if (sortedRequests[j] > sortedRequests[j + 1]) {
+                int temp = sortedRequests[j];
+                sortedRequests[j] = sortedRequests[j + 1];
+                sortedRequests[j + 1] = temp;
+            }
+        }
+    }
+    int initialHeadIndex = 0;
+    while (initialHeadIndex < numRequests && sortedRequests[initialHeadIndex] < initialHeadPosition) {
+        initialHeadIndex++;
+    }
+    for (int i = initialHeadIndex; i < numRequests; ++i) {
+        totalHeadMovement += abs(sortedRequests[i] - initialHeadPosition);
+        initialHeadPosition = sortedRequests[i];
+    }
+    totalHeadMovement += abs(diskSize - initialHeadPosition);
+    for (int i = 0; i < initialHeadIndex; ++i) {
+        totalHeadMovement += abs(sortedRequests[i] - 0);
+        initialHeadPosition = sortedRequests[i];
+    }
+    return totalHeadMovement;
+}
+int main() {
+    int requests[MAX_REQUESTS];
+    int numRequests;
+    int diskSize;
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &numRequests);
+    if (numRequests <= 0 || numRequests > MAX_REQUESTS) {
+        printf("Invalid number of requests. Exiting...\n");
+        return -1;
+    }
+    printf("Enter the disk requests:\n");
+    for (int i = 0; i < numRequests; ++i) {
+        printf("Request %d: ", i + 1);
+        scanf("%d", &requests[i]);
+    }
+    printf("Enter the disk size: ");
+    scanf("%d", &diskSize);
+    int initialHeadPosition;
+    printf("Enter the initial head position: ");
+    scanf("%d", &initialHeadPosition);
+    int totalHeadMovement = calculateTotalHeadMovement(requests, numRequests, initialHeadPosition, diskSize);
+    printf("Total head movement using C-SCAN: %d\n", totalHeadMovement);
+    return 0;
+}
