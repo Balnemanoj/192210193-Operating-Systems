@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_REQUESTS 100
+int calculateTotalHeadMovement(const int requests[], int numRequests, int initialHeadPosition) {
+    int totalHeadMovement = 0;
+    int currentHeadPosition = initialHeadPosition;
+    for (int i = 0; i < numRequests; ++i) {
+        totalHeadMovement += abs(requests[i] - currentHeadPosition);
+        currentHeadPosition = requests[i];
+    }
+    return totalHeadMovement;
+}
+int main() {
+    int requests[MAX_REQUESTS];
+    int numRequests;
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &numRequests);
+    if (numRequests <= 0 || numRequests > MAX_REQUESTS) {
+        printf("Invalid number of requests. Exiting...\n");
+        return -1;
+    }
+    printf("Enter the disk requests:\n");
+    for (int i = 0; i < numRequests; ++i) {
+        printf("Request %d: ", i + 1);
+        scanf("%d", &requests[i]);
+    }
+    int initialHeadPosition;
+    printf("Enter the initial head position: ");
+    scanf("%d", &initialHeadPosition);
+    int totalHeadMovement = calculateTotalHeadMovement(requests, numRequests, initialHeadPosition);
+    printf("Total head movement using FCFS: %d\n", totalHeadMovement);
+    return 0;
+}
