@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX_FRAMES 3
+#define MAX_PAGES 10
+int isPagePresent(int page, int frames[], int frameCount) {
+    for (int i = 0; i < frameCount; ++i) {
+        if (frames[i] == page) {
+            return 1; 
+        }
+    }
+    return 0; 
+}
+void displayFrames(int frames[], int frameCount) {
+    for (int i = 0; i < frameCount; ++i) {
+        if (frames[i] == -1) {
+            printf("[ ] "); 
+        } else {
+            printf("[%d] ", frames[i]); 
+        }
+    }
+    printf("\n");
+}
+void fifoPageReplacement(int pages[], int pageCount) {
+    int frames[MAX_FRAMES];
+    int frameCount = 0; 
+    int pageFaults = 0; 
+    for (int i = 0; i < MAX_FRAMES; ++i) {
+        frames[i] = -1;
+    }
+    for (int i = 0; i < pageCount; ++i) {
+        printf("Accessing Page %d: ", pages[i]);
+        if (isPagePresent(pages[i], frames, frameCount)) {
+            printf("Page Hit\n");
+        } else {
+            printf("Page Fault - ");
+            if (frameCount < MAX_FRAMES) {
+                frames[frameCount] = pages[i];
+                frameCount++;
+            } else {
+                printf("Replacing Page %d with Page %d\n", frames[0], pages[i]);
+                for (int j = 0; j < MAX_FRAMES - 1; ++j) {
+                    frames[j] = frames[j + 1];
+                }
+                frames[MAX_FRAMES - 1] = pages[i];
+            }
+            pageFaults++;
+            displayFrames(frames, MAX_FRAMES);
+        }
+    }
+    printf("Total Page Faults: %d\n", pageFaults);
+}
+int main() {
+    int pages[MAX_PAGES] = {0, 1, 2, 3, 2, 4, 3, 4, 5, 4}; // Page reference string
+    int pageCount = sizeof(pages) / sizeof(pages[0]);
+    printf("FIFO Page Replacement Simulation\n\n");
+    fifoPageReplacement(pages, pageCount);
+    return 0;
+}
