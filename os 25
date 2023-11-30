@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <dirent.h>
+
+int main() {
+    // Example of fcntl system call
+    int fd = open("example.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    if (fd == -1) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    // Example of seek system call
+    off_t offset = lseek(fd, 10, SEEK_SET);
+    if (offset == -1) {
+        perror("Error seeking file");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    // Example of stat system call
+    struct stat fileStat;
+    if (fstat(fd, &fileStat) == -1) {
+        perror("Error getting file status");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    printf("File Size: %lld bytes\n", (long long)fileStat.st_size);
+
+    // Example of opendir and readdir system calls
+    DIR *dir = opendir(".");
+    if (dir == NULL) {
+        perror("Error opening directory");
+        close(fd);
+        exit(EXIT_FAILURE);
+    }
+
+    struct dirent *entry;
+    printf("Files in the current directory:\n");
+    while ((entry = readdir(dir)) != NULL) {
+        printf("%s\n", entry->d_name);
+    }
+    closedir(dir);
+
+    // Clean up and close the file
+    close(fd);
+
+    return 0;
+}
