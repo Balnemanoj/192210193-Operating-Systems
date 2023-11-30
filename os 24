@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdlib.h>
+int main() {
+    FILE *file;
+    char fileName[50];
+    char data[100];
+    printf("Enter the name of the file to create: ");
+    scanf("%s", fileName);
+
+    file = fopen(fileName, "w");
+    if (file == NULL) {
+        perror("Error creating the file");
+        exit(EXIT_FAILURE);
+    }
+    printf("Enter data to write to the file (max 100 characters):\n");
+    scanf(" %[^\n]", data);
+    fprintf(file, "%s", data);
+
+    fclose(file);
+    printf("File created successfully.\n");
+    file = fopen(fileName, "r");
+    if (file == NULL) {
+        perror("Error opening the file");
+        exit(EXIT_FAILURE);
+    }
+    printf("\nContent of the file:\n");
+    while (fscanf(file, "%s", data) != EOF) {
+        printf("%s ", data);
+    }
+    fclose(file);
+    file = fopen(fileName, "a");
+    if (file == NULL) {
+        perror("Error opening the file for appending");
+        exit(EXIT_FAILURE);
+    }
+    printf("\nEnter additional data to append to the file (max 100 characters):\n");
+    scanf(" %[^\n]", data);
+    fprintf(file, " %s", data);
+
+    fclose(file);
+    printf("Data appended to the file successfully.\n");
+
+    return 0;
+}
